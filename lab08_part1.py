@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+
 PIN_BUTTON = 4
 PIN_LED = 18
 PIN_SERVO = 23
