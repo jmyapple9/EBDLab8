@@ -28,37 +28,29 @@ GPIO.setup(PIN_BUTTON, GPIO.IN)
 servo = GPIO.PWM(PIN_SERVO, 50) 
 # 50 Hz PWM frequency
 servo.start(2) # start at 0 degrees
-# time.sleep(1)
-# servo.ChangeDutyCycle(7) # 90 degrees
-# time.sleep(1)
-# servo.ChangeDutyCycle(1)
-# time.sleep(1)
-def ServoMove(Up, timer):
+
+def ServoMove(Up, sec):
     global servo_current
     # for i in range(2,7,0.1)
     if Up:
         if servo_current < servo_max:
-            servo_current += 1
+            servo_current += 0.5
+            servo.ChangeDutyCycle(servo_current)
         else:
             servo_current = servo_max
     else:
         if servo_current > servo_min:
-            servo_current -= 1
+            servo_current -= 0.5
+            servo.ChangeDutyCycle(servo_current)
         else:
             servo_current = servo_min
-    time.sleep(timer)
-    print(f'servo_current: {servo_current}')
-    servo.ChangeDutyCycle(servo_current)
+    time.sleep(sec)
 
-    # servo_current += 1
-    # if servo_current >= servo_max:
-    #     servo_current = servo_max
 # led
 def stopAll():
     GPIO.output(PIN_BUZZER, GPIO.LOW)
     GPIO.output(PIN_LED2, GPIO.LOW)
     GPIO.output(PIN_LED1, GPIO.LOW)
-    # servo.start(2) # start at 0 degrees
 
 # buzzer
 def Buzz(sec):
@@ -77,21 +69,17 @@ try:
         if train:
             Buzz(timer)
             blinkLED(timer)
-            # servo.ChangeDutyCycle(7) # 90 degrees
-            ServoMove(train, timer)
-        if not train:
-            stopAll()
+        else:
             if servo_current > 2:
-                GPIO.output(PIN_BUZZER, GPIO.HIGH)
+                Buzz(timer)
                 blinkLED(timer)
-            ServoMove(train, timer)
+            else:
+                stopAll()
+
+        ServoMove(train, timer)
 except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
    print("Keyboard interrupt")
-# except:
-#    print("some error") 
-
 finally:
    print("clean up")
    stopAll()
-   servo.start(2)
    GPIO.cleanup() # cleanup all GPIO 
